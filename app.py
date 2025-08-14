@@ -8,10 +8,10 @@ from src.auth import display_auth_form
 from src.chatbot_ui import display_chatbot_interface
 from src.rag_components import load_base_components
 
-st.set_page_config(page_title="CS50 Chatbot", layout="centered")
+st.set_page_config(page_title="CS50 & Lịch sử Chatbot", layout="centered")
 
 # Tải các thành phần RAG và client Supabase
-vector_store, prompt, supabase_client = load_base_components()
+vector_stores, prompt, supabase_client = load_base_components()
 
 # Kiểm tra xem đã có session người dùng chưa
 if 'user_session' not in st.session_state:
@@ -28,7 +28,7 @@ else:
     
     # Truyền thêm tên người dùng vào giao diện
     display_chatbot_interface(
-        vector_store=vector_store,
+        vector_stores=vector_stores,
         prompt=prompt,
         supabase_client=supabase_client,
         user_id=user_id,

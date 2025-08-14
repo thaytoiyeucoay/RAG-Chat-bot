@@ -1,4 +1,4 @@
-# update_db.py (Phiên bản nâng cấp cho Supabase)
+# update_db_history.py (Cập nhật dữ liệu Lịch sử vào Supabase Vector Store)
 import os
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -13,12 +13,12 @@ if "GOOGLE_API_KEY" not in os.environ or "SUPABASE_URL" not in os.environ or "SU
     print("Lỗi: Vui lòng kiểm tra các biến môi trường trong file .env")
     exit()
 
-print("Bắt đầu quá trình cập nhật cơ sở dữ liệu CS50 trên Supabase...")
+print("Bắt đầu quá trình cập nhật cơ sở dữ liệu Lịch sử trên Supabase...")
 
 # --- 1. ĐỊNH NGHĨA CÁC THAM SỐ ---
-# Thư mục chứa dữ liệu CS50
-DATA_PATH = "C:/Users/VCSVietNam/duybk/db_history" 
-# Thông tin bảng và hàm trên Supabase cho CS50
+# Thư mục chứa dữ liệu Lịch sử (trong dự án)
+DATA_PATH = "db_history" 
+# Thông tin bảng và hàm trên Supabase cho Lịch sử
 TABLE_NAME = "history_documents"
 QUERY_NAME = "match_history_documents"
 EMBEDDING_MODEL = "models/embedding-001"
@@ -28,6 +28,13 @@ supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(supabase_url, supabase_key)
 embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)
+try:
+    _probe_vector = embeddings.embed_query("health_check_dimension")
+    _expected_dim = len(_probe_vector)
+    print(f"Embedding model '{EMBEDDING_MODEL}' sẵn sàng. Số chiều kỳ vọng: {_expected_dim}.")
+except Exception as e:
+    print(f"Lỗi khi khởi tạo embedding model '{EMBEDDING_MODEL}': {e}")
+    exit(1)
 
 # Khởi tạo đối tượng vector store để tương tác
 
@@ -49,7 +56,7 @@ except Exception as e:
 
 # Lấy ra danh sách các nguồn (đường dẫn file) duy nhất đã được xử lý
 existing_sources = set(doc['metadata']['source'] for doc in existing_docs_metadata if 'metadata' in doc and 'source' in doc['metadata'])
-print(f"Đã tìm thấy {len(existing_sources)} tài liệu CS50 đã được xử lý trong database.")
+print(f"Đã tìm thấy {len(existing_sources)} tài liệu Lịch sử đã được xử lý trong database.")
 
 # --- 4. TÌM CÁC FILE MỚI CẦN XỬ LÝ ---
 all_files_in_data = set()
@@ -63,9 +70,9 @@ new_files_to_process = all_files_in_data - existing_sources
 
 # --- 5. XỬ LÝ VÀ THÊM CÁC FILE MỚI VÀO DATABASE ---
 if not new_files_to_process:
-    print("\nKhông có file mới nào cần thêm. Cơ sở dữ liệu CS50 đã được cập nhật.")
+    print("\nKhông có file mới nào cần thêm. Cơ sở dữ liệu Lịch sử đã được cập nhật.")
 else:
-    print(f"\nPhát hiện {len(new_files_to_process)} file CS50 mới cần xử lý:")
+    print(f"\nPhát hiện {len(new_files_to_process)} file Lịch sử mới cần xử lý:")
     for file_path in new_files_to_process:
         print(f"- {os.path.basename(file_path)}")
 
@@ -81,7 +88,28 @@ else:
     
     print(f"Đang thêm {len(new_chunks)} chunks mới vào cơ sở dữ liệu Supabase...")
     # >>> SỬ DỤNG vector_store.add_documents ĐỂ THÊM VÀO DB HIỆN CÓ
-    vector_store.add_documents(new_chunks)
+    try:
+        vector_store.add_documents(new_chunks)
+    except Exception as e:
+        print("\n[!] Lỗi khi thêm tài liệu vào Supabase Vector Store.")
+        print("    Khả năng cao do số chiều cột 'embedding' không khớp với mô hình embedding.")
+        print(f"    Mô hình hiện tại: {EMBEDDING_MODEL} — số chiều kỳ vọng: {_expected_dim}.")
+        print("    Hãy đảm bảo cột 'embedding' có kiểu vector(_expected_dim), ví dụ: vector(768).")
+        print("    Gợi ý SQL (Postgres/pgvector):")
+        print("""
+-- Tạo bảng nếu chưa có
+create table if not exists public.history_documents (
+  id uuid primary key default gen_random_uuid(),
+  content text,
+  metadata jsonb,
+  embedding vector(768)
+);
+
+-- Nếu cột 'embedding' sai dimension, bạn cần đổi sang dimension đúng
+-- Cách đơn giản nhất là tạo bảng đúng schema rồi nạp lại dữ liệu.
+-- Hoặc: tạo cột mới với dimension đúng, sao chép dữ liệu và đổi tên cột.
+        """)
+        raise
     
     print("-" * 50)
-    print("THÀNH CÔNG! Đã cập nhật xong cơ sở dữ liệu CS50.")
+    print("THÀNH CÔNG! Đã cập nhật xong cơ sở dữ liệu Lịch sử.")

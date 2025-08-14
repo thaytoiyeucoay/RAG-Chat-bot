@@ -21,8 +21,8 @@ supabase_key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # --- 1. TẢI VÀ PHÂN MẢNH DỮ LIỆU ---
-print("Đang tải và phân mảnh dữ liệu từ thư mục 'data/'...")
-DATA_PATH = "C:\\Users\\VCSVietNam\\duybk\\cs50_notes"
+print("Đang tải và phân mảnh dữ liệu từ thư mục 'cs50_notes/'...")
+DATA_PATH = "cs50_notes"
 documents = []
 for filename in os.listdir(DATA_PATH):
     if filename.endswith(".txt"):

@@ -17,9 +17,9 @@ if "GOOGLE_API_KEY" not in os.environ:
     exit()
 
 # --- 1. ĐỊNH NGHĨA CÁC THAM SỐ ---
-# Dùng lại dữ liệu CS50 cũ
-DATA_PATH = "C:/Users/VCSVietNam/duybk/cs50_notes" 
-# >>> THAY ĐỔI QUAN TRỌNG: Tạo một thư mục DB MỚI để không ghi đè lên cái cũ
+# Dữ liệu CS50 trong dự án
+DATA_PATH = "cs50_notes" 
+# Thư mục DB cục bộ
 DB_PATH = "vectorstore_google/" 
 
 # --- 2. XÓA DATABASE CŨ (NẾU CÓ) ĐỂ LÀM MỚI ---
@@ -28,7 +28,7 @@ if os.path.exists(DB_PATH):
     shutil.rmtree(DB_PATH)
 
 # --- 3. TẢI VÀ PHÂN MẢNH DỮ LIỆU (Giữ nguyên như cũ) ---
-print("Đang tải và phân mảnh dữ liệu từ thư mục 'data/'...")
+print("Đang tải và phân mảnh dữ liệu từ thư mục 'cs50_notes/'...")
 documents = []
 for filename in os.listdir(DATA_PATH):
     if filename.endswith(".txt"):
