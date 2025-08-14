@@ -8,7 +8,16 @@ from src.auth import display_auth_form
 from src.chatbot_ui import display_chatbot_interface
 from src.rag_components import load_base_components
 
-st.set_page_config(page_title="CS50 & Lịch sử Chatbot", layout="centered")
+st.set_page_config(
+	page_title="CS50 & Lịch sử Chatbot",
+	page_icon="🤖",
+	layout="wide",
+	menu_items={
+		"Get help": "https://docs.streamlit.io/",
+		"Report a bug": "https://github.com/streamlit/streamlit/issues",
+		"About": "Trợ lý học tập CS50 & Lịch sử — xây dựng với Streamlit"
+	}
+)
 
 # Tải các thành phần RAG và client Supabase
 vector_stores, prompt, supabase_client = load_base_components()
