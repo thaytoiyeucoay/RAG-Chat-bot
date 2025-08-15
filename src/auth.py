@@ -5,36 +5,117 @@ from supabase import Client
 def _inject_auth_css():
     css = """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+        --primary-600: #2563eb;
+        --gray-50: #f8fafc;
+        --gray-200: #e2e8f0;
+        --gray-500: #64748b;
+        --gray-700: #334155;
+        --gray-900: #0f172a;
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+    }
+
     html, body, [data-testid="stAppViewContainer"] * {
-        font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial !important;
+        font-family: 'Inter', sans-serif !important;
     }
+
     [data-testid="stAppViewContainer"] {
-        background: radial-gradient(1200px 600px at 0% 0%, #f0f7ff 0%, #ffffff 50%) no-repeat;
+        background: var(--gray-50);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
     }
+
+    .auth-container {
+        max-width: 420px;
+        width: 100%;
+        margin: 2rem;
+        padding: 2.5rem;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-md);
+    }
+
     .auth-hero {
-        border-radius: 18px; padding: 22px 24px; margin-bottom: 12px;
-        background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(59,130,246,0.06) 100%);
-        border: 1px solid rgba(59,130,246,0.25);
+        text-align: center;
+        margin-bottom: 2rem;
     }
-    .auth-hero h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; }
-    .auth-hero p { color: #334155; margin: 0; }
-    .auth-card {
-        border-radius: 16px; padding: 18px 16px; border: 1px solid #e2e8f0; background: #ffffff;
-        box-shadow: 0 6px 20px rgba(30,58,138,0.06);
+
+    .auth-logo {
+        font-size: 2.5rem; /* Smaller logo */
+        margin-bottom: 1rem;
+        color: var(--primary-600);
     }
-    .hint { color: #64748b; font-size: 13px; }
-    .or-sep { text-align:center; color:#94a3b8; font-size:12px; margin: 6px 0; }
-    .muted { color:#64748b; }
-    /* Buttons */
-    .stButton>button {
-        border-radius: 12px; padding: 0.6rem 0.9rem;
-        background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-        border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 700;
+
+    .auth-hero h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0 0 0.5rem 0;
     }
-    .stButton>button:hover { filter: brightness(1.05); }
-    .stTextInput>div>div>input { border-radius: 10px; }
-    .stPassword>div>div>input { border-radius: 10px; }
+
+    .auth-hero p {
+        color: var(--gray-500);
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .stTabs [data-baseweb="tab-list"] {
+        justify-content: center;
+        border-bottom: 2px solid var(--gray-200);
+        margin-bottom: 1.5rem;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        padding: 0.75rem 0.5rem !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        color: var(--gray-500);
+        border-bottom: 2px solid transparent !important;
+        margin: 0 1rem;
+    }
+
+    .stTabs [aria-selected="true"] {
+        color: var(--primary-600) !important;
+        border-bottom-color: var(--primary-600) !important;
+    }
+
+    .stTextInput > div > div > input,
+    .stPassword > div > div > input {
+        border-radius: 8px !important;
+        border: 1px solid var(--gray-200) !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+    }
+
+    .stTextInput > div > div > input:focus,
+    .stPassword > div > div > input:focus {
+        border-color: var(--primary-600) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    }
+
+    .stButton > button {
+        width: 100% !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        background-color: var(--primary-600) !important;
+        border: none !important;
+    }
+    
+    .stButton > button:hover {
+        filter: brightness(1.1);
+    }
+
+    .stAlert {
+        border-radius: 8px !important;
+    }
+
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -46,15 +127,12 @@ def display_auth_form(supabase_client: Client):
 
     st.markdown(
         """
-        <div class="auth-hero">
-            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-                <div style="font-size:28px;">🛡️</div>
-                <div>
-                    <h1>Chào mừng đến với CS50 & Lịch sử Assistant</h1>
-                    <p>Đăng nhập hoặc tạo tài khoản để bắt đầu trải nghiệm học tập tuyệt vời.</p>
-                </div>
+        <div class="auth-container">
+            <div class="auth-hero">
+                <div class="auth-logo">🎓</div>
+                <h1>CS50 & Lịch sử Assistant</h1>
+                <p>Trải nghiệm học tập thông minh với AI - Đăng nhập để khám phá kiến thức CS50 và Lịch sử Việt Nam</p>
             </div>
-        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -63,62 +141,87 @@ def display_auth_form(supabase_client: Client):
 
     # Form Đăng nhập
     with tab1:
-        st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
         with st.form("login_form", clear_on_submit=False):
-            email = st.text_input("Email", placeholder="you@example.com")
-            password = st.text_input("Mật khẩu", type="password", placeholder="••••••••")
+            st.markdown("### 🔐 Đăng nhập vào tài khoản")
+            
+            email = st.text_input("📧 Email", placeholder="your.email@example.com", help="Nhập địa chỉ email của bạn")
+            password = st.text_input("🔒 Mật khẩu", type="password", placeholder="••••••••", help="Nhập mật khẩu của bạn")
 
-            col1, col2 = st.columns([1,1])
-            with col1:
-                login_button = st.form_submit_button("Đăng nhập")
-            with col2:
-                st.caption("Quên mật khẩu? Hãy liên hệ quản trị viên.")
+            st.markdown("<br>", unsafe_allow_html=True)
+            login_button = st.form_submit_button("🚀 Đăng nhập", use_container_width=True)
+            
+            st.markdown(
+                """
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p style="color: var(--gray-500); font-size: 0.875rem;">
+                        Quên mật khẩu? <a href="#" style="color: var(--primary-600); text-decoration: none;">Liên hệ quản trị viên</a>
+                    </p>
+                </div>
+                """, 
+                unsafe_allow_html=True
+            )
 
             if login_button:
                 if email and password:
-                    try:
-                        user = supabase_client.auth.sign_in_with_password({
-                            "email": email,
-                            "password": password
-                        })
-                        st.session_state['user_session'] = user
-                        st.success("Đăng nhập thành công! Đang chuyển hướng…")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Lỗi đăng nhập: {e}")
+                    with st.spinner("🔄 Đang xác thực..."):
+                        try:
+                            user = supabase_client.auth.sign_in_with_password({
+                                "email": email,
+                                "password": password
+                            })
+                            st.session_state['user_session'] = user
+                            st.success("✅ Đăng nhập thành công! Đang chuyển hướng...")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"❌ Lỗi đăng nhập: {e}")
                 else:
-                    st.warning("Vui lòng nhập đầy đủ email và mật khẩu.")
-        st.markdown("</div>", unsafe_allow_html=True)
+                    st.warning("⚠️ Vui lòng nhập đầy đủ email và mật khẩu.")
 
     # Form Đăng ký
     with tab2:
-        st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
         with st.form("register_form", clear_on_submit=True):
-            full_name = st.text_input("Tên đầy đủ", placeholder="Nguyễn Văn A")
-            email = st.text_input("Email đăng ký", placeholder="you@example.com")
-            password = st.text_input("Mật khẩu mới", type="password", placeholder="Tối thiểu 6 ký tự")
+            st.markdown("### ✍️ Tạo tài khoản mới")
+            
+            full_name = st.text_input("👤 Tên đầy đủ", placeholder="Nguyễn Văn A", help="Nhập họ và tên của bạn")
+            email = st.text_input("📧 Email đăng ký", placeholder="your.email@example.com", help="Email này sẽ dùng để đăng nhập")
+            password = st.text_input("🔒 Mật khẩu mới", type="password", placeholder="Tối thiểu 6 ký tự", help="Tạo mật khẩu mạnh để bảo vệ tài khoản")
 
-            col1, col2 = st.columns([1,1])
-            with col1:
-                register_button = st.form_submit_button("Tạo tài khoản")
-            with col2:
-                st.caption("Bằng việc đăng ký, bạn đồng ý với Điều khoản sử dụng.")
+            st.markdown("<br>", unsafe_allow_html=True)
+            register_button = st.form_submit_button("🎉 Tạo tài khoản", use_container_width=True)
+            
+            st.markdown(
+                """
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p style="color: var(--gray-500); font-size: 0.875rem;">
+                        Bằng việc đăng ký, bạn đồng ý với 
+                        <a href="#" style="color: var(--primary-600); text-decoration: none;">Điều khoản sử dụng</a>
+                        và <a href="#" style="color: var(--primary-600); text-decoration: none;">Chính sách bảo mật</a>
+                    </p>
+                </div>
+                """, 
+                unsafe_allow_html=True
+            )
 
             if register_button:
                 if full_name and email and password:
-                    try:
-                        user = supabase_client.auth.sign_up({
-                            "email": email,
-                            "password": password,
-                            "options": {
-                                "data": {
-                                    'full_name': full_name,
-                                }
-                            }
-                        })
-                        st.success("Đăng ký thành công! Vui lòng đăng nhập.")
-                    except Exception as e:
-                        st.error(f"Lỗi đăng ký: {e}")
+                    if len(password) < 6:
+                        st.warning("⚠️ Mật khẩu phải có ít nhất 6 ký tự.")
+                    else:
+                        with st.spinner("🔄 Đang tạo tài khoản..."):
+                            try:
+                                user = supabase_client.auth.sign_up({
+                                    "email": email,
+                                    "password": password,
+                                    "options": {
+                                        "data": {
+                                            'full_name': full_name,
+                                        }
+                                    }
+                                })
+                                st.success("🎉 Đăng ký thành công! Vui lòng chuyển sang tab Đăng nhập.")
+                            except Exception as e:
+                                st.error(f"❌ Lỗi đăng ký: {e}")
                 else:
-                    st.warning("Vui lòng điền đầy đủ thông tin.")
-        st.markdown("</div>", unsafe_allow_html=True)
+                    st.warning("⚠️ Vui lòng điền đầy đủ thông tin.")
+    
+    st.markdown("</div>", unsafe_allow_html=True)

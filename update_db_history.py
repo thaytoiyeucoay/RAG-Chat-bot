@@ -17,7 +17,7 @@ print("Bắt đầu quá trình cập nhật cơ sở dữ liệu Lịch sử tr
 
 # --- 1. ĐỊNH NGHĨA CÁC THAM SỐ ---
 # Thư mục chứa dữ liệu Lịch sử (trong dự án)
-DATA_PATH = "db_history" 
+DATA_PATH = "C:/Users/VCSVietNam/duybk/db_history" 
 # Thông tin bảng và hàm trên Supabase cho Lịch sử
 TABLE_NAME = "history_documents"
 QUERY_NAME = "match_history_documents"
